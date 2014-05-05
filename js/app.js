@@ -3,7 +3,8 @@ $(document).ready(function() {
 	* Constants
 	****************/
 	
-	var DEBUG = true;
+	// var DEBUG = true;
+	var DEBUG = false;
 	var ENTER_KEY_CODE = 13;
 	
 	var WUNDERGROUND_API_URL = 'http://api.wunderground.com/api/';
