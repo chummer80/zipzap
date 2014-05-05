@@ -76,11 +76,11 @@ $(document).ready(function() {
 			.done(function(data) {
 				debug("WUnderground API SUCCESS");
 				
-				var wUnderground_results = $('#results_templates #wunderground_results').clone();
+				var wUnderground_results = $('#wunderground_results');
 				
 				if (data.response.error) {
 					wUnderground_results.find('#location').text(data.response.error.description);
-					wUnderground_results.appendTo($('#results'));
+					// wUnderground_results.appendTo($('#results'));
 				}
 				else {
 					var current = data.current_observation;
@@ -100,7 +100,7 @@ $(document).ready(function() {
 					wUnderground_results.find('#weather_icon').attr('src', current.icon_url);
 					wUnderground_results.find('#weather_icon').attr('alt', current.icon + " icon");
 					
-					wUnderground_results.appendTo($('#results'));
+					// wUnderground_results.appendTo($('#results'));
 					
 					drawMap();
 				}
@@ -118,8 +118,7 @@ $(document).ready(function() {
 			zoom: 13
 		};
 		
-		var mapCanvasJquery = $('#results_templates #google_map_canvas').clone().appendTo($('#results'));
-		var mapCanvasDOM = mapCanvasJquery[0];
+		var mapCanvasDOM = $('#google_map_canvas')[0];
 		map = new google.maps.Map(mapCanvasDOM, mapOptions);
 		debug("map has been drawn");
 		
