@@ -12,6 +12,11 @@ input {
 	font-size: 2rem;
 }
 
+div {
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .top_div {
 	background-color: slategrey;
 }
@@ -29,8 +34,6 @@ header {
 }
 #input_div {
 	width: 30rem;
-	margin-left: auto;
-	margin-right: auto;
 	margin-top: 0;
 	border-bottom-left-radius: 50px;
 	border-bottom-right-radius: 50px;
@@ -44,6 +47,7 @@ header {
 .input_instruction_text {
 	margin: 1rem;
 	font-size: 2rem;
+	color: white;
 }
 
 #zip_input_text {
@@ -51,7 +55,7 @@ header {
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
-	margin-bottom: 0.5rem;
+	margin-bottom: 0.8rem;
 }
 
 #zip_input_button {
@@ -66,12 +70,31 @@ header {
 	border-radius: 15px;
 }
 
-#zip_input_button:hover {
-	background-color: DeepSkyBlue;
-	
+#zip_input_button:disabled {
+	opacity: 0.4;
 }
 
-#zip_input_button:active {
+#zip_input_button:not(:disabled):hover {
+	background-color: DeepSkyBlue;
+}
+
+#zip_input_button:not(:disabled):active {
 	background-position: center center;
 	background-size: 90%;
 }
+
+
+#loading {
+	display: none;
+	width: min-content;
+	width: -webkit-min-content;
+	margin-top: 2rem;
+}
+
+#results {
+	display: none;
+	height: 40rem;
+	width: 40rem;
+	background-color: lightgreen;
+}
+

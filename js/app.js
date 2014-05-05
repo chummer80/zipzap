@@ -8,6 +8,11 @@ $(document).ready(function() {
 	* Functions
 	****************/
 	
+	var isInputValid = function isInputValid() {
+		var inputString = $('#zip_input_text').val();
+		return /^\d{5}$/.test(inputString);
+	};
+	
 	/***************
 	* Event Handlers
 	****************/
@@ -37,9 +42,22 @@ $(document).ready(function() {
 			}
 		}
 	});
+	
+	$('#zip_input_text').keyup(function() {
+		console.log("textbox says: " + this.value);
+		$('#zip_input_button').attr('disabled', isInputValid() ? false : true);
+	});
 		
 	$('#zip_input_button').click(function() {
 		console.log("ZAP button clicked");
+		
+		var inputString = this.value;
+		if (isInputValid()) {
+			$('#input_div').slideUp(null, function() {
+				$('#loading').show();
+			});	
+		}
+		
 	});
 		
 	
@@ -48,11 +66,21 @@ $(document).ready(function() {
 	* Start
 	****************/
 	
+	// Automatically show the loading gif when an ajax request is in progress.
+	$.ajaxSetup({
+		beforeSend: function() {
+			$('#loading').show();
+		},
+		complete: function(){
+			$('#loading').hide();
+		}
+	});
+	
 	$('#input_div').slideDown();
 	
 	// ZIPTASTIC TEST CODE
 	var zipCode = '90210';
-	$.ajax(ZIPTASTIC_API_URL + zipCode, {dataType: 'jsonp'})
+	var xhr = $.ajax(ZIPTASTIC_API_URL + zipCode, {dataType: 'jsonp'})
 		.done(function(data) {
 			console.log("DONE");
 			console.log(data);
@@ -61,4 +89,5 @@ $(document).ready(function() {
 		.fail(function(data) {
 			console.log("FAIL");
 		});
+		
 });
