@@ -12,20 +12,23 @@
 	<script src="js/app.js"></script>
 </head>
 <body>
-	<header class="top_div">
+	<header class="top_div panel">
 		<img id="zz_logo" src="images/zipzap_logo.png" alt="zip_zap_logo">
+		<div id="input_div">
+			<p class="input_instruction_text">Want some info on a ZIP code?</p>
+			<p class="input_instruction_text">Enter any 5-digit ZIP here!</p>
+			<input id="zip_input_text" type="text" maxlength="5" autofocus>
+			<input id="zip_input_button" type="submit" value="" disabled>
+		</div>
 	</header>
-	<div id="input_div" class="top_div">
-		<p class="input_instruction_text">Want some info on a ZIP code?</p>
-		<p class="input_instruction_text">Enter any 5-digit ZIP here!</p>
-		<input id="zip_input_text" type="text" maxlength="5" autofocus>
-		<input id="zip_input_button" type="submit" value="" disabled>
-	</div>
 	<div id="loading">
 		<img src="images/loading.gif">
 	</div>
-	<div id="results">
-	
+	<div id="results" class="panel">
+		<h1 id="zipcode">90210</h1>
+		<div id="ziptastic_results">
+			<p>Beverly Hills, CA, US</p>
+		</div>
 	</div>
 </body>
 </html>

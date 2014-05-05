@@ -2,7 +2,7 @@ $(document).ready(function() {
 	var ENTER_KEY_CODE = 13;
 	var ZIPTASTIC_API_URL = 'http://ZiptasticAPI.com/';
 
-	
+	var zipCode = 00000;
 	
 	/***************
 	* Functions
@@ -13,6 +13,13 @@ $(document).ready(function() {
 		return /^\d{5}$/.test(inputString);
 	};
 	
+	var toTitleCase = function toTitleCase(str)
+	{
+		return str.replace(/\w\S*/g, function(txt) {
+			return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+		});
+	}
+
 	/***************
 	* Event Handlers
 	****************/
@@ -53,11 +60,10 @@ $(document).ready(function() {
 		
 		var inputString = this.value;
 		if (isInputValid()) {
-			$('#input_div').slideUp(null, function() {
-				$('#loading').show();
-			});	
+			zipCode = $('#zip_input_text').val();
+			$('#input_div').slideUp();	
+			$('#loading').show('blind');
 		}
-		
 	});
 		
 	
@@ -69,25 +75,38 @@ $(document).ready(function() {
 	// Automatically show the loading gif when an ajax request is in progress.
 	$.ajaxSetup({
 		beforeSend: function() {
-			$('#loading').show();
+			// $('#loading').show();
 		},
 		complete: function(){
-			$('#loading').hide();
+			// $('#loading').hide();
 		}
 	});
 	
 	$('#input_div').slideDown();
 	
 	// ZIPTASTIC TEST CODE
-	var zipCode = '90210';
+ 	zipCode = '91356';
 	var xhr = $.ajax(ZIPTASTIC_API_URL + zipCode, {dataType: 'jsonp'})
 		.done(function(data) {
 			console.log("DONE");
 			console.log(data);
-			console.log("city is " + data.city);
+			
+			data.city = toTitleCase(data.city);
+			var locationString = toTitleCase(data.city) + ", " + data.state + ", " + data.country;
+			console.log("location is " + locationString);
+			
+			// change the heading of the results panel
+			$('#zipcode').text(zipCode);
+			
+			// clear previous Ziptastic results, then put the new results there instead
+			$('#ziptastic_results')
+				.empty()
+				.html('<p>' + locationString + '</p>');
+			
+			$('#results').fadeIn();
 		})
 		.fail(function(data) {
 			console.log("FAIL");
 		});
-		
+		 
 });

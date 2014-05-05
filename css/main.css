@@ -5,6 +5,7 @@
 body {
 	min-width: 60rem;
 	font-family: Tahoma, Verdana, Segoe, sans-serif;
+	padding: 1.5rem;
 }
 
 input {
@@ -12,9 +13,15 @@ input {
 	font-size: 2rem;
 }
 
-div {
+h1 {
+	font-size: 4rem;
+}
+
+.panel {
 	margin-left: auto;
 	margin-right: auto;
+	border-radius: 50px;
+	box-shadow: 10px 10px 5px lightgrey;
 }
 
 .top_div {
@@ -22,25 +29,17 @@ div {
 }
 
 header {
-	height: 12rem;
-	margin: 1rem 1rem 0 1rem;
-	border-radius: 50px;
-	box-shadow: 10px 10px 5px lightgrey;
+	width: 60rem;
 	text-align: center;
+	padding-bottom: 2rem;
 }
 
 #zz_logo {
 	height: 100%;
 }
 #input_div {
-	width: 30rem;
-	margin-top: 0;
-	border-bottom-left-radius: 50px;
-	border-bottom-right-radius: 50px;
-	box-shadow: 10px 10px 5px lightgrey;
-	padding: 1rem;
+	width: 60rem;
 	text-align: center;
-	
 	display: none;
 }
 
@@ -86,15 +85,26 @@ header {
 
 #loading {
 	display: none;
-	width: min-content;
+	margin-left: auto;
+	margin-right: auto;
 	width: -webkit-min-content;
+	width: -moz-min-content;
+	width: min-content;
 	margin-top: 2rem;
 }
 
 #results {
 	display: none;
-	height: 40rem;
-	width: 40rem;
-	background-color: lightgreen;
+	box-sizing: border-box;
+	width: 60rem;
+	padding: 1rem;
+	margin-top: 2rem;
+	border: 3px solid slategrey;
+	text-align: center;
 }
 
+#ziptastic_results {
+	margin-top: 0.8em;
+	font-size: 2.5em;
+	color: green;
+}
