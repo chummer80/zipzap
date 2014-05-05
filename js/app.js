@@ -6,8 +6,6 @@ $(document).ready(function() {
 	var DEBUG = true;
 	var ENTER_KEY_CODE = 13;
 	
-	var ZIPTASTIC_API_URL = 'http://ZiptasticAPI.com/';
-	
 	var WUNDERGROUND_API_URL = 'http://api.wunderground.com/api/';
 	var WUNDERGROUND_API_KEY = '96b52a67f7730e2e';
 	
@@ -16,7 +14,11 @@ $(document).ready(function() {
 	****************/
 	
 	var zipCode = 00000;
+	var zipCoordinates = {};
 	var showingResults = false;
+	var map = null;
+	var geocodingBounds = null;
+	var zipCodeOverlay = null;
 	
 	/***************
 	* Functions
@@ -40,6 +42,29 @@ $(document).ready(function() {
 		});
 	}
 
+	var startGeocode = function startGeocode(zip) {
+		var geocoder = new google.maps.Geocoder();
+		
+		geocoder.geocode({address: zip.toString()}, function(results, status) {
+			if (status == google.maps.GeocoderStatus.OK) {
+				debug("Geocode success");
+				debug(results);
+				
+				// There might be multiple results from our search, but just use the first one.
+				geocodingBounds = results[0].geometry.bounds;
+				// we're not guaranteed to get bounds when we attempt to geocode.
+				// if map is ready, we can draw the overlay.
+				if ((geocodingBounds instanceof google.maps.LatLngBounds) && (map instanceof google.maps.Map)) {
+					debug("startGeocode: map is ready, calling drawOverlay");
+					drawOverlay(geocodingBounds);
+				}
+			}
+			else {
+				debug("Geocode was not successful for the following reason: " + status);
+			}
+		});
+	};
+	
 	var startAJAX = function startAJAX(zip) {
 		// change the heading of the results panel
 		$('#zipcode').text(zip);
@@ -55,6 +80,7 @@ $(document).ready(function() {
 				
 				if (data.response.error) {
 					wUnderground_results.find('#location').text(data.response.error.description);
+					wUnderground_results.appendTo($('#results'));
 				}
 				else {
 					var current = data.current_observation;
@@ -63,6 +89,9 @@ $(document).ready(function() {
 					debug("location is " + locationString);
 					wUnderground_results.find('#location').text(locationString);
 					
+					zipCoordinates.lat = Number(current.display_location.latitude);
+					zipCoordinates.lng = Number(current.display_location.longitude);
+					
 					var coordinateString = current.display_location.latitude + ", " + current.display_location.longitude;
 					wUnderground_results.find('#coordinates').text("Coordinates: " + coordinateString);
 					
@@ -70,14 +99,40 @@ $(document).ready(function() {
 					wUnderground_results.find('#weather').text("Weather: " + current.weather);
 					wUnderground_results.find('#weather_icon').attr('src', current.icon_url);
 					wUnderground_results.find('#weather_icon').attr('alt', current.icon + " icon");
+					
+					wUnderground_results.appendTo($('#results'));
+					
+					drawMap();
 				}
-				wUnderground_results.appendTo($('#results'));			
 				
 				showResults();
 			})
 			.fail(function() {
 				debug("WUnderground API FAIL");
 			});
+	};
+	
+	var drawMap = function drawMap() {
+		var mapOptions = {
+			center: zipCoordinates,
+			zoom: 13
+		};
+		
+		var mapCanvasJquery = $('#results_templates #google_map_canvas').clone().appendTo($('#results'));
+		var mapCanvasDOM = mapCanvasJquery[0];
+		map = new google.maps.Map(mapCanvasDOM, mapOptions);
+		debug("map has been drawn");
+		
+		// if geocoding is already done, then the zip code overlay can be drawn. Otherwise just set a flag
+		if ((geocodingBounds instanceof google.maps.LatLngBounds) && (map instanceof google.maps.Map)) {
+			debug("drawMap: bounds are ready, calling drawOverlay");
+			drawOverlay(map, geocodingBounds);
+		}
+	};
+	
+	var drawOverlay = function drawOverlay(map, bounds) {
+		zipCodeOverlay = new google.maps.GroundOverlay('images/zipcode_highlight.png', bounds);
+		zipCodeOverlay.setMap(map);
 	};
 	
 	var showResults = function showResults() {
@@ -131,6 +186,8 @@ $(document).ready(function() {
 			zipCode = $('#zip_input_text').val();
 			$('#input_div').slideUp();	
 			$('#loading').show('blind');
+			
+			startGeocode(zipCode);
 			startAJAX(zipCode);
 		}
 	});
