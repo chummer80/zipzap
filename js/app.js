@@ -1,9 +1,22 @@
 $(document).ready(function() {
+	/***************
+	* Constants
+	****************/
+	
 	var DEBUG = true;
 	var ENTER_KEY_CODE = 13;
+	
 	var ZIPTASTIC_API_URL = 'http://ZiptasticAPI.com/';
-
+	
+	var WUNDERGROUND_API_URL = 'http://api.wunderground.com/api/';
+	var WUNDERGROUND_API_KEY = '96b52a67f7730e2e';
+	
+	/***************
+	* Variables
+	****************/
+	
 	var zipCode = 00000;
+	var showingResults = false;
 	
 	/***************
 	* Functions
@@ -28,42 +41,51 @@ $(document).ready(function() {
 	}
 
 	var startAJAX = function startAJAX(zip) {
-		// Ziptastic http request
-		var xhr = $.ajax(ZIPTASTIC_API_URL + zip, {dataType: 'jsonp'})
+		// change the heading of the results panel
+		$('#zipcode').text(zip);
+			
+		var wUndergroundFullURL = WUNDERGROUND_API_URL + WUNDERGROUND_API_KEY + 
+			'/conditions/q/' + zip + '.json';
+			
+		$.ajax(wUndergroundFullURL, {dataType: 'jsonp'})
 			.done(function(data) {
-				debug("DONE");
-				debug(data);
+				debug("WUnderground API SUCCESS");
 				
-				// change the heading of the results panel
-				$('#zipcode').text(zip);
+				var wUnderground_results = $('#results_templates #wunderground_results').clone();
 				
-				if (data.error) {
-					$('#ziptastic_results')
-						.empty()
-						.html('<p>' + data.error + '</p>');
+				if (data.response.error) {
+					wUnderground_results.find('#location').text(data.response.error.description);
 				}
 				else {
-					data.city = toTitleCase(data.city);
-					var locationString = toTitleCase(data.city) + ", " + data.state + ", " + data.country;
-					debug("location is " + locationString);
+					var current = data.current_observation;
 					
-					// clear previous Ziptastic results, then put the new results there instead
-					$('#ziptastic_results')
-						.empty()
-						.html('<p>' + locationString + '</p>');
+					var locationString = toTitleCase(current.display_location.city) + ", " + current.display_location.state + ", " + current.display_location.country;
+					debug("location is " + locationString);
+					wUnderground_results.find('#location').text(locationString);
+					
+					var coordinateString = current.display_location.latitude + ", " + current.display_location.longitude;
+					wUnderground_results.find('#coordinates').text("Coordinates: " + coordinateString);
+					
+					wUnderground_results.find('#temperature').text("Temperature: " + current.temperature_string);
+					wUnderground_results.find('#weather').text("Weather: " + current.weather);
+					wUnderground_results.find('#weather_icon').attr('src', current.icon_url);
+					wUnderground_results.find('#weather_icon').attr('alt', current.icon + " icon");
 				}
+				wUnderground_results.appendTo($('#results'));			
 				
 				showResults();
 			})
-			.fail(function(data) {
-				debug("FAIL");
+			.fail(function() {
+				debug("WUnderground API FAIL");
 			});
 	};
 	
 	var showResults = function showResults() {
-		// $('#loading').hide('blind', {direction: 'down'});
-		$('#loading').hide();
-		$('#results').fadeIn();
+		if (!showingResults) {
+			showingResults = true;
+			$('#loading').hide();
+			$('#results').fadeIn();
+		}
 	};
 	
 	/***************

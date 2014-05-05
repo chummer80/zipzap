@@ -13,7 +13,7 @@
 </head>
 <body>
 	<header class="top_div panel">
-		<img id="zz_logo" src="images/zipzap_logo.png" alt="zip_zap_logo">
+		<img id="zz_logo" src="images/zipzap_logo.png" alt="ZIP Zap logo">
 		<div id="input_div">
 			<p class="input_instruction_text">Want some info on a ZIP code?</p>
 			<p class="input_instruction_text">Enter any 5-digit ZIP here!</p>
@@ -22,12 +22,18 @@
 		</div>
 	</header>
 	<div id="loading">
-		<img src="images/loading.gif">
+		<img src="images/loading.gif" alt="loading animation">
 	</div>
 	<div id="results" class="panel">
 		<h1 id="zipcode">90210</h1>
-		<div id="ziptastic_results">
-			<p>Beverly Hills, CA, US</p>
+		<div id="results_templates">
+			<div id="wunderground_results">
+				<p id="location" class="wunderground_result"></p>
+				<p id="coordinates" class="wunderground_result"></p>
+				<p id="temperature" class="wunderground_result"></p>
+				<p id="weather" class="wunderground_result"></p>
+				<img id="weather_icon" class="wunderground_result">
+			</div>
 		</div>
 	</div>
 </body>
