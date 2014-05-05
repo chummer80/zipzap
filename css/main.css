@@ -108,13 +108,17 @@ header {
 }
 
 #wunderground_results {
-	margin-top: 1rem;
+	margin-top: 3rem;
 	font-size: 2.5rem;
 	color: green;
 }
 
 .wunderground_result {
 	margin-bottom: 1rem;
+}
+
+#weather_icon {
+	width: 7rem;
 }
 
 #google_map_canvas {
