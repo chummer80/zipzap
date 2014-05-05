@@ -1,0 +1,77 @@
+* {
+	outline: 1px red solid;
+}
+
+body {
+	min-width: 60rem;
+	font-family: Tahoma, Verdana, Segoe, sans-serif;
+}
+
+input {
+	font-family: Tahoma, Verdana, Segoe, sans-serif;
+	font-size: 2rem;
+}
+
+.top_div {
+	background-color: slategrey;
+}
+
+header {
+	height: 12rem;
+	margin: 1rem 1rem 0 1rem;
+	border-radius: 50px;
+	box-shadow: 10px 10px 5px lightgrey;
+	text-align: center;
+}
+
+#zz_logo {
+	height: 100%;
+}
+#input_div {
+	width: 30rem;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 0;
+	border-bottom-left-radius: 50px;
+	border-bottom-right-radius: 50px;
+	box-shadow: 10px 10px 5px lightgrey;
+	padding: 1rem;
+	text-align: center;
+	
+	display: none;
+}
+
+.input_instruction_text {
+	margin: 1rem;
+	font-size: 2rem;
+}
+
+#zip_input_text {
+	width: 5.5rem;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 0.5rem;
+}
+
+#zip_input_button {
+	width: 10rem;
+	height: 4rem;
+	outline: none;
+	background-color: DodgerBlue;
+	background-image: url('../images/zap.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	border: 0px;
+	border-radius: 15px;
+}
+
+#zip_input_button:hover {
+	background-color: DeepSkyBlue;
+	
+}
+
+#zip_input_button:active {
+	background-position: center center;
+	background-size: 90%;
+}
