@@ -9,6 +9,8 @@ $(document).ready(function() {
 	var WUNDERGROUND_API_URL = 'http://api.wunderground.com/api/';
 	var WUNDERGROUND_API_KEY = '96b52a67f7730e2e';
 	
+	var INITIAL_MAP_ZOOM = 13;	// for google maps initial display
+	
 	/***************
 	* Variables
 	****************/
@@ -115,11 +117,16 @@ $(document).ready(function() {
 	var drawMap = function drawMap() {
 		var mapOptions = {
 			center: zipCoordinates,
-			zoom: 13
+			zoom: INITIAL_MAP_ZOOM
 		};
 		
-		var mapCanvasDOM = $('#google_map_canvas')[0];
-		map = new google.maps.Map(mapCanvasDOM, mapOptions);
+		if (map instanceof google.maps.Map) {
+			map.setOptions(mapOptions);
+		}
+		else {
+			var mapCanvasDOM = $('#google_map_canvas')[0];
+			map = new google.maps.Map(mapCanvasDOM, mapOptions);
+		}
 		debug("map has been drawn");
 		
 		// if geocoding is already done, then the zip code overlay can be drawn. Otherwise just set a flag
@@ -132,6 +139,9 @@ $(document).ready(function() {
 	var drawOverlay = function drawOverlay(map, bounds) {
 		zipCodeOverlay = new google.maps.GroundOverlay('images/zipcode_highlight.png', bounds);
 		zipCodeOverlay.setMap(map);
+		
+		// Just in case the original coordinates are not the center of the zip code, re-center the map.
+		map.setCenter(bounds.getCenter());
 	};
 	
 	var showResults = function showResults() {
