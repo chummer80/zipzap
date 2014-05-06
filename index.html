@@ -7,6 +7,7 @@
 	<link rel="icon" href="images/zipzap_icon.ico" >
 	<link rel="stylesheet" href="css/reset.css">
 	<link rel="stylesheet" href="css/main.css">
+	<link rel="stylesheet" href="css/jquery-ui-theme/jquery-ui-1.10.4.custom.css">
 	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 	<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
 	<script type="text/javascript"
@@ -29,14 +30,21 @@
 	</div>
 	<div id="results" class="panel">
 		<h1 id="zipcode">90210</h1>
-		<div id="wunderground_results">
-			<p id="location" class="wunderground_result"></p>
-			<p id="coordinates" class="wunderground_result"></p>
-			<p id="temperature" class="wunderground_result"></p>
-			<p id="weather" class="wunderground_result"></p>
-			<img id="weather_icon" class="wunderground_result">
+		
+		<div id="tabs">
+			<ul>
+				<li><a href="#wunderground_results">Info</a></li>
+				<li><a href="#google_map_canvas">Map</a></li>
+			</ul>
+			<div id="wunderground_results" class="tab">
+				<p id="location" class="wunderground_result"></p>
+				<p id="coordinates" class="wunderground_result"></p>
+				<p id="temperature" class="wunderground_result"></p>
+				<p id="weather" class="wunderground_result"></p>
+				<img id="weather_icon" class="wunderground_result">
+			</div>
+			<div id="google_map_canvas" class="tab"></div>
 		</div>
-		<div id="google_map_canvas"></div>
 	</div>
 </body>
 </html>

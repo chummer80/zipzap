@@ -104,23 +104,26 @@ header {
 	text-align: center;
 }
 
-#wunderground_results {
-	margin-top: 3rem;
-	font-size: 2.5rem;
-	color: green;
-}
-
-.wunderground_result {
-	margin-bottom: 1rem;
-}
-
-#weather_icon {
-	width: 7rem;
-}
-
-#google_map_canvas {
+.tab {
 	height: 40rem;
 	width: 50rem;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+#zipcode {
+	margin-bottom: 2rem;
+}
+
+#wunderground_results {
+	font-size: 2.5rem;
+	color: black;
+}
+
+.wunderground_result {
+	margin-bottom: 2rem;
+}
+
+#weather_icon {
+	width: 7rem;
 }

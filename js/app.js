@@ -82,7 +82,6 @@ $(document).ready(function() {
 				
 				if (data.response.error) {
 					wUnderground_results.find('#location').text(data.response.error.description);
-					// wUnderground_results.appendTo($('#results'));
 				}
 				else {
 					var current = data.current_observation;
@@ -101,10 +100,6 @@ $(document).ready(function() {
 					wUnderground_results.find('#weather').text("Weather: " + current.weather);
 					wUnderground_results.find('#weather_icon').attr('src', current.icon_url);
 					wUnderground_results.find('#weather_icon').attr('alt', current.icon + " icon");
-					
-					// wUnderground_results.appendTo($('#results'));
-					
-					drawMap();
 				}
 				
 				showResults();
@@ -201,10 +196,17 @@ $(document).ready(function() {
 		}
 	});
 	
-	
 	/***************
 	* Start
 	****************/
-	
+	$('#tabs').tabs({
+		activate: function (event, ui) {
+			if (ui.newPanel.is('#google_map_canvas')) {
+				if (!(map instanceof google.maps.Map)) {
+					drawMap();
+				}
+			}
+		}
+	});
 	$('#input_div').slideDown();
 });
