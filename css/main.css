@@ -118,10 +118,16 @@ header {
 #wunderground_results {
 	font-size: 2.5rem;
 	color: black;
+	
+	/* vertically center the results within this panel */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 
 .wunderground_result {
-	margin-bottom: 2rem;
+	line-height: 6rem;
 }
 
 #weather_icon {
