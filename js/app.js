@@ -116,7 +116,7 @@ $(document).ready(function() {
 		$('#zipcode').text(zip);
 			
 		var wUndergroundFullURL = WUNDERGROUND_API_URL + WUNDERGROUND_API_KEY + 
-			'/conditions/q/' + zip + '.json';
+			'/geolookup/conditions/q/' + zip + '.json';
 			
 		$.ajax(wUndergroundFullURL, {dataType: 'jsonp'})
 			.done(function(data) {
@@ -128,9 +128,10 @@ $(document).ready(function() {
 					wUnderground_results.find('#location').text(data.response.error.description);
 				}
 				else {
+					var geolookup = data.location;
 					var current = data.current_observation;
 					
-					var locationString = toTitleCase(current.display_location.city) + ", " + current.display_location.state + ", " + current.display_location.country;
+					var locationString = toTitleCase(geolookup.city) + ", " + geolookup.state + ", " + geolookup.country_name;
 					debug("location is " + locationString);
 					wUnderground_results.find('#location').text(locationString);
 					
@@ -138,8 +139,8 @@ $(document).ready(function() {
 					if (!zipCoordinates) {
 						zipCoordinates = {};
 					}
-					zipCoordinates.lat = Number(current.display_location.latitude);
-					zipCoordinates.lng = Number(current.display_location.longitude);
+					zipCoordinates.lat = Number(geolookup.lat);
+					zipCoordinates.lng = Number(geolookup.lon);
 					
 					// if google earth obj exists, pan google earth camera to this location
 					if (ge) {
@@ -149,6 +150,7 @@ $(document).ready(function() {
 					var coordinateString = current.display_location.latitude + ", " + current.display_location.longitude;
 					wUnderground_results.find('#coordinates').text("Coordinates: " + coordinateString);
 					
+					wUnderground_results.find('#time_zone').text("Time Zone: " + geolookup.tz_short);
 					wUnderground_results.find('#temperature').text("Temperature: " + current.temperature_string);
 					wUnderground_results.find('#weather').text("Weather: " + current.weather);
 					wUnderground_results.find('#weather_icon').attr('src', current.icon_url);
