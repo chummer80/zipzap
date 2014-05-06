@@ -13,6 +13,7 @@
 	<script type="text/javascript"
 		src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCgU31lyvDVbPmZR-zpC1g-jTcgT4wWlOY&sensor=false">
     </script>
+	<script src="http://www.google.com/jsapi"></script>
 	<script src="js/app.js"></script>
 </head>
 <body>
@@ -35,6 +36,7 @@
 			<ul>
 				<li><a href="#wunderground_results">Info</a></li>
 				<li><a href="#google_map_canvas">Map</a></li>
+				<li><a href="#google_earth">3D View</a></li>
 			</ul>
 			<div id="wunderground_results" class="tab">
 				<p id="location" class="wunderground_result"></p>
@@ -42,8 +44,10 @@
 				<p id="temperature" class="wunderground_result"></p>
 				<p id="weather" class="wunderground_result"></p>
 				<img id="weather_icon" class="wunderground_result">
+				
 			</div>
 			<div id="google_map_canvas" class="tab"></div>
+			<div id="google_earth" class="tab"></div>
 		</div>
 	</div>
 </body>

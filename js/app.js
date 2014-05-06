@@ -1,3 +1,6 @@
+// load google earth's "earth" module
+google.load("earth", "1");
+
 $(document).ready(function() {
 	/***************
 	* Constants
@@ -9,18 +12,20 @@ $(document).ready(function() {
 	var WUNDERGROUND_API_URL = 'http://api.wunderground.com/api/';
 	var WUNDERGROUND_API_KEY = '96b52a67f7730e2e';
 	
-	var INITIAL_MAP_ZOOM = 13;	// for google maps initial display
+	var INITIAL_MAP_ZOOM = 12;	// for google maps initial display
 	
 	/***************
 	* Variables
 	****************/
 	
 	var zipCode = 00000;
-	var zipCoordinates = {};
+	var zipCoordinates = null;
 	var showingResults = false;
 	var map = null;
 	var geocodingBounds = null;
 	var zipCodeOverlay = null;
+	var ge = null; // google earth object
+	
 	
 	/***************
 	* Functions
@@ -32,6 +37,44 @@ $(document).ready(function() {
 		}
 	};
 	
+	// Callback for creation of google earth object
+	var geComplete = function geComplete(instance) {
+		debug("Google Earth object was created");
+		
+		ge = instance;
+		ge.getWindow().setVisibility(true);
+		ge.getNavigationControl().setVisibility(ge.VISIBILITY_SHOW);
+		ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+		ge.getLayerRoot().enableLayerById(ge.LAYER_BUILDINGS, true);
+		ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+		
+		debug("Google Earth object should be visible now");
+		
+		// if coordinates have already been recieved, pan camera to that location
+		if (zipCoordinates) {
+			geLookAt(zipCoordinates);
+		}
+	};
+	
+	// Callback to handle google earth object creation failure
+	var geFail = function geFail(errorCode) {
+		debug("Google Earth object creation failed, error code: " + errorCode);
+	};
+	
+	var geLookAt = function geLookAt(coordinates) {
+		// Create a new LookAt.
+		var lookAt = ge.createLookAt('');
+
+		// Set the position values.
+		lookAt.setLatitude(coordinates.lat);
+		lookAt.setLongitude(coordinates.lng);
+		lookAt.setRange(1000.0); //default is 0.0
+
+		// Update the view in Google Earth.
+		ge.getView().setAbstractView(lookAt);
+	}
+	
+	// detect a 5-digit zip code
 	var isInputValid = function isInputValid() {
 		var inputString = $('#zip_input_text').val();
 		return /^\d{5}$/.test(inputString);
@@ -44,6 +87,7 @@ $(document).ready(function() {
 		});
 	}
 
+	// Get google maps geocoding data in order to get approximate zip code boundaries
 	var startGeocode = function startGeocode(zip) {
 		var geocoder = new google.maps.Geocoder();
 		
@@ -90,8 +134,17 @@ $(document).ready(function() {
 					debug("location is " + locationString);
 					wUnderground_results.find('#location').text(locationString);
 					
+					// This is the first time coordinates have been stored
+					if (!zipCoordinates) {
+						zipCoordinates = {};
+					}
 					zipCoordinates.lat = Number(current.display_location.latitude);
 					zipCoordinates.lng = Number(current.display_location.longitude);
+					
+					// if google earth obj exists, pan google earth camera to this location
+					if (ge) {
+						geLookat(zipCoordinates);
+					}
 					
 					var coordinateString = current.display_location.latitude + ", " + current.display_location.longitude;
 					wUnderground_results.find('#coordinates').text("Coordinates: " + coordinateString);
@@ -199,14 +252,20 @@ $(document).ready(function() {
 	/***************
 	* Start
 	****************/
+	
+	// initialize JQuery tab widget
 	$('#tabs').tabs({
 		activate: function (event, ui) {
-			if (ui.newPanel.is('#google_map_canvas')) {
-				if (!(map instanceof google.maps.Map)) {
-					drawMap();
-				}
+			// the first time this tab is viewed, create google map
+			if (ui.newPanel.is('#google_map_canvas') && !(map instanceof google.maps.Map)) {
+				drawMap();
+			}
+			// the first time this tab is viewed, create google earth obj
+			else if (ui.newPanel.is('#google_earth') && !ge) {
+				google.earth.createInstance('google_earth', geComplete, geFail);
 			}
 		}
 	});
+	
 	$('#input_div').slideDown();
 });
