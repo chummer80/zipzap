@@ -18,9 +18,8 @@ $(document).ready(function() {
 	* Variables
 	****************/
 	
-	var zipCode = 00000;
-	var zipCoordinates = null;
-	var showingResults = false;
+	var zipCode = '';
+	var zipCoordinates = {};
 	var map = null;
 	var geocodingBounds = null;
 	var zipCodeOverlay = null;
@@ -36,6 +35,28 @@ $(document).ready(function() {
 			console.log(message);
 		}
 	};
+	
+	// reset all zip code data except for google map and google earth objects (for efficiency)
+	var resetSearchData = function resetSearchData() {
+		zipCode = '';
+		zipCoordinates = {};
+		geocodingBounds = null;
+		
+		if (zipCodeOverlay instanceof google.maps.GroundOverlay) {
+			zipCodeOverlay.setMap(null);
+			zipCodeOverlay = null;
+		}
+	};
+	
+	// detect a 5-digit zip code
+	var isInputValid = function isInputValid() {
+		var inputString = $('#zip_input_text').val();
+		return /^\d{5}$/.test(inputString);
+	};
+	
+	/***********************
+	* Google Earth Functions
+	************************/
 	
 	// Callback for creation of google earth object
 	var geComplete = function geComplete(instance) {
@@ -68,25 +89,16 @@ $(document).ready(function() {
 		// Set the position values.
 		lookAt.setLatitude(coordinates.lat);
 		lookAt.setLongitude(coordinates.lng);
-		lookAt.setRange(1000.0); //default is 0.0
+		lookAt.setRange(2000.0); //default is 0.0
 
 		// Update the view in Google Earth.
 		ge.getView().setAbstractView(lookAt);
 	}
 	
-	// detect a 5-digit zip code
-	var isInputValid = function isInputValid() {
-		var inputString = $('#zip_input_text').val();
-		return /^\d{5}$/.test(inputString);
-	};
+	/***********************
+	* Google Maps Functions
+	************************/
 	
-	var toTitleCase = function toTitleCase(str)
-	{
-		return str.replace(/\w\S*/g, function(txt) {
-			return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-		});
-	}
-
 	// Get google maps geocoding data in order to get approximate zip code boundaries
 	var startGeocode = function startGeocode(zip) {
 		var geocoder = new google.maps.Geocoder();
@@ -101,8 +113,8 @@ $(document).ready(function() {
 				// we're not guaranteed to get bounds when we attempt to geocode.
 				// if map is ready, we can draw the overlay.
 				if ((geocodingBounds instanceof google.maps.LatLngBounds) && (map instanceof google.maps.Map)) {
-					debug("startGeocode: map is ready, calling drawOverlay");
-					drawOverlay(geocodingBounds);
+					debug("startGeocode: map is ready, calling drawMapOverlay");
+					drawMapOverlay(map, geocodingBounds);
 				}
 			}
 			else {
@@ -111,59 +123,7 @@ $(document).ready(function() {
 		});
 	};
 	
-	var startAJAX = function startAJAX(zip) {
-		// change the heading of the results panel
-		$('#zipcode').text(zip);
-			
-		var wUndergroundFullURL = WUNDERGROUND_API_URL + WUNDERGROUND_API_KEY + 
-			'/geolookup/conditions/q/' + zip + '.json';
-			
-		$.ajax(wUndergroundFullURL, {dataType: 'jsonp'})
-			.done(function(data) {
-				debug("WUnderground API SUCCESS");
-				
-				var wUnderground_results = $('#wunderground_results');
-				
-				if (data.response.error) {
-					wUnderground_results.find('#location').text(data.response.error.description);
-				}
-				else {
-					var geolookup = data.location;
-					var current = data.current_observation;
-					
-					var locationString = toTitleCase(geolookup.city) + ", " + geolookup.state + ", " + geolookup.country_name;
-					debug("location is " + locationString);
-					wUnderground_results.find('#location').text(locationString);
-					
-					// This is the first time coordinates have been stored
-					if (!zipCoordinates) {
-						zipCoordinates = {};
-					}
-					zipCoordinates.lat = Number(geolookup.lat);
-					zipCoordinates.lng = Number(geolookup.lon);
-					
-					// if google earth obj exists, pan google earth camera to this location
-					if (ge) {
-						geLookat(zipCoordinates);
-					}
-					
-					var coordinateString = current.display_location.latitude + ", " + current.display_location.longitude;
-					wUnderground_results.find('#coordinates').text("Coordinates: " + coordinateString);
-					
-					wUnderground_results.find('#time_zone').text("Time Zone: " + geolookup.tz_short);
-					wUnderground_results.find('#temperature').text("Temperature: " + current.temperature_string);
-					wUnderground_results.find('#weather').text("Weather: " + current.weather);
-					wUnderground_results.find('#weather_icon').attr('src', current.icon_url);
-					wUnderground_results.find('#weather_icon').attr('alt', current.icon + " icon");
-				}
-				
-				showResults();
-			})
-			.fail(function() {
-				debug("WUnderground API FAIL");
-			});
-	};
-	
+		
 	var drawMap = function drawMap() {
 		var mapOptions = {
 			center: zipCoordinates,
@@ -180,13 +140,14 @@ $(document).ready(function() {
 		debug("map has been drawn");
 		
 		// if geocoding is already done, then the zip code overlay can be drawn. Otherwise just set a flag
-		if ((geocodingBounds instanceof google.maps.LatLngBounds) && (map instanceof google.maps.Map)) {
-			debug("drawMap: bounds are ready, calling drawOverlay");
-			drawOverlay(map, geocodingBounds);
+		if (geocodingBounds instanceof google.maps.LatLngBounds) {
+			console.assert(map instanceof google.maps.Map);
+			debug("drawMap: bounds are ready, calling drawMapOverlay");
+			drawMapOverlay(map, geocodingBounds);
 		}
 	};
 	
-	var drawOverlay = function drawOverlay(map, bounds) {
+	var drawMapOverlay = function drawMapOverlay(map, bounds) {
 		zipCodeOverlay = new google.maps.GroundOverlay('images/zipcode_highlight.png', bounds);
 		zipCodeOverlay.setMap(map);
 		
@@ -194,20 +155,74 @@ $(document).ready(function() {
 		map.setCenter(bounds.getCenter());
 	};
 	
-	var showResults = function showResults() {
-		if (!showingResults) {
-			showingResults = true;
-			$('#loading').hide();
-			$('#results').fadeIn();
-		}
+	/***********************
+	* AJAX Functions
+	************************/
+	
+	// WeatherUnderground API call
+	var startAJAX = function startAJAX(zip) {
+		// change the heading of the results panel
+		$('#zipcode').text(zip);
+			
+		var wUndergroundFullURL = WUNDERGROUND_API_URL + WUNDERGROUND_API_KEY + 
+			'/geolookup/conditions/q/' + zip + '.json';
+			
+		$.ajax(wUndergroundFullURL, {dataType: 'jsonp'})
+			.done(function(data) {
+				debug("WUnderground API response was received");
+				
+				var wUnderground_results = $('#wunderground_results');
+				
+				if (data.response.error) {
+					debug("WUnderground API error");
+					wUnderground_results.find('#location').text(data.response.error.description);
+				}
+				else {
+					debug("WUnderground API SUCCESS");
+					var geolookup = data.location;
+					var current = data.current_observation;
+					
+					zipCoordinates.lat = Number(geolookup.lat);
+					zipCoordinates.lng = Number(geolookup.lon);
+
+					// populate Info tab
+					var locationString = geolookup.city + ", " + geolookup.state + ", " + geolookup.country_name;
+					debug("location is " + locationString);
+					wUnderground_results.find('#location').text(locationString);
+					
+					var coordinateString = zipCoordinates.lat + ", " + zipCoordinates.lng;
+					wUnderground_results.find('#coordinates').text("Coordinates: " + coordinateString);
+					
+					wUnderground_results.find('#time_zone').text("Time Zone: " + geolookup.tz_short);
+					wUnderground_results.find('#temperature').text("Temperature: " + current.temperature_string);
+					wUnderground_results.find('#weather').text("Weather: " + current.weather);
+					wUnderground_results.find('#weather_icon').attr('src', current.icon_url);
+					wUnderground_results.find('#weather_icon').attr('alt', current.icon + " icon");
+					
+					// if map object exists already, pan map to the right place.
+					if (map instanceof google.maps.Map) {
+						drawMap();
+					}
+					
+					// if google earth obj exists, pan google earth camera to this location
+					if (ge) {
+						geLookAt(zipCoordinates);
+					}
+				}
+				
+				$('#loading').hide();
+				$('#results').fadeIn();
+			})
+			.fail(function() {
+				debug("WUnderground API FAIL");
+			});
 	};
 	
-	/***************
-	* Event Handlers
-	****************/
+	/**************************
+	* DOM Object Event Handlers
+	***************************/
 	
 	$('#zip_input_text').keypress(function(event) {
-		
 		var isDigit = function isDigit (keyCode) {
 			debug("key entered (code): " + keyCode);
 			
@@ -251,6 +266,21 @@ $(document).ready(function() {
 		}
 	});
 	
+	$('#new_zap_button').click(function() {
+		$('#results').slideUp();
+		
+		// clear previous search
+		$('#zip_input_button').attr('disabled', true);
+		$('#zip_input_text').val("");
+		resetSearchData();
+		
+		$('#input_div').slideDown(function() {
+		
+			$('#zip_input_text').focus();
+		
+		});
+	});
+	
 	/***************
 	* Start
 	****************/
@@ -269,5 +299,6 @@ $(document).ready(function() {
 		}
 	});
 	
+	// reveal user input area
 	$('#input_div').slideDown();
 });

@@ -11,7 +11,7 @@
 	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 	<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
 	<script type="text/javascript"
-		src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCgU31lyvDVbPmZR-zpC1g-jTcgT4wWlOY&sensor=false">
+		src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCgU31lyvDVbPmZR-zpC1g-jTcgT4wWlOY&amp;sensor=false">
     </script>
 	<script src="http://www.google.com/jsapi"></script>
 	<script src="js/app.js"></script>
@@ -44,12 +44,14 @@
 				<p id="time_zone" class="wunderground_result"></p>
 				<p id="temperature" class="wunderground_result"></p>
 				<p id="weather" class="wunderground_result"></p>
-				<img id="weather_icon" class="wunderground_result">
+				<img id="weather_icon" class="wunderground_result" src="images/zap.png" alt="weather icon placeholder">
 				
 			</div>
 			<div id="google_map_canvas" class="tab"></div>
 			<div id="google_earth" class="tab"></div>
 		</div>
+		
+		<input id="new_zap_button" type="submit" value="Zap Another ZIP">
 	</div>
 </body>
 </html>

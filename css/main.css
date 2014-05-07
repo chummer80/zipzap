@@ -52,11 +52,12 @@ header {
 }
 
 #zip_input_text {
-	width: 5.5rem;
+	width: 5.8rem;
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
 	margin-bottom: 0.8rem;
+	padding-left: 0.2rem;
 }
 
 #zip_input_button {
@@ -132,4 +133,8 @@ header {
 
 #weather_icon {
 	width: 7rem;
+}
+
+#new_zap_button  {
+	margin-top: 2rem;
 }
