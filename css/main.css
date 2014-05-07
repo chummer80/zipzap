@@ -63,24 +63,28 @@ header {
 #zip_input_button {
 	width: 10rem;
 	height: 4rem;
-	outline: none;
-	background-color: DodgerBlue;
 	background-image: url('../images/zap.png');
+}
+
+input[type="submit"] {
+	outline: none;
+	color: white;
+	background-color: DodgerBlue;
 	background-repeat: no-repeat;
-	background-size: contain;
+	background-size: contain; 
 	border: 0px;
 	border-radius: 15px;
 }
 
-#zip_input_button:disabled {
+input[type="submit"]:disabled {
 	opacity: 0.4;
 }
 
-#zip_input_button:not(:disabled):hover {
+input[type="submit"]:not(:disabled):hover {
 	background-color: DeepSkyBlue;
 }
 
-#zip_input_button:not(:disabled):active {
+input[type="submit"]:not(:disabled):active {
 	background-position: center center;
 	background-size: 90%;
 }
@@ -137,4 +141,10 @@ header {
 
 #new_zap_button  {
 	margin-top: 2rem;
+}
+
+#new_zap_button:active {
+	position:relative;
+	left: 1px;
+	top: 2px;
 }
