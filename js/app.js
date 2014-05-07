@@ -42,10 +42,16 @@ $(document).ready(function() {
 		zipCoordinates = {};
 		geocodingBounds = null;
 		
-		if (zipCodeOverlay instanceof google.maps.GroundOverlay) {
-			zipCodeOverlay.setMap(null);
-			zipCodeOverlay = null;
-		}
+		removeMapOverlay();
+		
+		// clear all search results except google map and google earth
+		$('#zipcode').text("");
+		$('.wunderground_result').text("");
+		$('#weather_icon').attr('src', '//:0');
+		$('#weather_icon').attr('alt', '');
+		
+		// enable all tabs if they were disabled previously
+		$('#tabs').tabs('enable');
 	};
 	
 	// detect a 5-digit zip code
@@ -122,7 +128,6 @@ $(document).ready(function() {
 			}
 		});
 	};
-	
 		
 	var drawMap = function drawMap() {
 		var mapOptions = {
@@ -139,12 +144,7 @@ $(document).ready(function() {
 		}
 		debug("map has been drawn");
 		
-		// if geocoding is already done, then the zip code overlay can be drawn. Otherwise just set a flag
-		if (geocodingBounds instanceof google.maps.LatLngBounds) {
-			console.assert(map instanceof google.maps.Map);
-			debug("drawMap: bounds are ready, calling drawMapOverlay");
-			drawMapOverlay(map, geocodingBounds);
-		}
+		startGeocode(zipCode);
 	};
 	
 	var drawMapOverlay = function drawMapOverlay(map, bounds) {
@@ -154,6 +154,15 @@ $(document).ready(function() {
 		// Just in case the original coordinates are not the center of the zip code, re-center the map.
 		map.setCenter(bounds.getCenter());
 	};
+	
+	var removeMapOverlay = function removeMapOverlay() {
+		if (zipCodeOverlay instanceof google.maps.GroundOverlay) {
+			zipCodeOverlay.setMap(null);
+			zipCodeOverlay = null;
+			
+			debug("Map overlay was removed");
+		}
+	}
 	
 	/***********************
 	* AJAX Functions
@@ -176,6 +185,10 @@ $(document).ready(function() {
 				if (data.response.error) {
 					debug("WUnderground API error");
 					wUnderground_results.find('#location').text(data.response.error.description);
+					
+					$('#tabs').tabs('option', 'active', 0);	// switch to the "info" tab
+					$('#tabs').tabs('option', 'disabled', [1,2]);	// disable the maps and 3d view tabs
+					
 				}
 				else {
 					debug("WUnderground API SUCCESS");
@@ -200,6 +213,7 @@ $(document).ready(function() {
 					wUnderground_results.find('#weather_icon').attr('alt', current.icon + " icon");
 					
 					// if map object exists already, pan map to the right place.
+					// if map doesn't exist yet, it will be drawn later when the map tab is clicked.
 					if (map instanceof google.maps.Map) {
 						drawMap();
 					}
@@ -261,23 +275,21 @@ $(document).ready(function() {
 			$('#input_div').slideUp();	
 			$('#loading').show('blind');
 			
-			startGeocode(zipCode);
 			startAJAX(zipCode);
 		}
 	});
 	
 	$('#new_zap_button').click(function() {
-		$('#results').slideUp();
+		$('#results').slideUp(function() {
+			resetSearchData();
+		});
 		
-		// clear previous search
+		// clear previous search input
 		$('#zip_input_button').attr('disabled', true);
 		$('#zip_input_text').val("");
-		resetSearchData();
-		
+			
 		$('#input_div').slideDown(function() {
-		
 			$('#zip_input_text').focus();
-		
 		});
 	});
 	
@@ -300,5 +312,7 @@ $(document).ready(function() {
 	});
 	
 	// reveal user input area
-	$('#input_div').slideDown();
+	$('#input_div').slideDown(function() {
+		$('#zip_input_text').focus();
+	});
 });
