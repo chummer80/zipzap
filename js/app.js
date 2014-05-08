@@ -290,6 +290,7 @@ $(document).ready(function() {
 	});
 	
 	$('#new_zap_button').click(function() {
+		debug("New zap button clicked");
 		$('#results').slideUp(function() {
 			zip.resetSearchData();
 		});
