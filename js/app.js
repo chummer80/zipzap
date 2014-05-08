@@ -85,6 +85,10 @@ $(document).ready(function() {
 		if (zip.zipCoordinates) {
 			zip.geLookAt();
 		}
+		
+		// re-enable UI after google earth element is completely created
+		$('#tabs').tabs('enable');
+		$('#new_zap_button').attr('disabled', false);
 	};
 	
 	// Callback to handle google earth object creation failure
@@ -154,7 +158,8 @@ $(document).ready(function() {
 		zip.zipCodeOverlay.setMap(zip.map);
 		
 		// Just in case the original coordinates are not the center of the zip code, re-center the map.
-		zip.map.setCenter(zip.geocodingBounds.getCenter());
+		// zip.map.setCenter(zip.geocodingBounds.getCenter());
+		zip.map.fitBounds(zip.geocodingBounds);
 	};
 	
 	zip.removeMapOverlay = function removeMapOverlay() {
@@ -306,15 +311,32 @@ $(document).ready(function() {
 	// initialize JQueryUI tab widget
 	$('#tabs').tabs({
 		activate: function (event, ui) {
-			// the first time this tab is viewed, create google map
-			if (ui.newPanel.is('#google_map_canvas') && !zip.mapExists) {
-				zip.mapExists = true;	
-				zip.drawMap();
-				zip.startGeocode();
+			if (ui.newPanel.is('#google_map_canvas')) {
+				if (zip.mapExists) {
+					// if map already exists, pan and zoom to the zip code overlay
+					// Doing it here is a workaround to a bug that prevents panning/zooming when
+					// the map DOM element is hidden
+					if (zip.geocodingBounds) {
+						zip.map.fitBounds(zip.geocodingBounds);
+					}
+				}
+				else {
+					// the first time this tab is viewed, create google map
+					zip.mapExists = true;	
+					zip.drawMap();
+					zip.startGeocode();
+				}
 			}
 			// the first time this tab is viewed, create google earth obj
 			else if (ui.newPanel.is('#google_earth') && !zip.geExists) {
 				zip.geExists = true;	// this flag is just to make sure only 1 ge object gets created
+				
+				// Disable all other UI until google earth element is fully created.
+				// This is a workaround to avoid the occurence of a bug: 
+				// The google earth element cannot be hidden during creation, or
+				// it will never display properly.
+				$('#tabs').tabs('option', 'disabled', [0,1]);
+				$('#new_zap_button').attr('disabled', true);
 				google.earth.createInstance('google_earth', zip.geComplete, zip.geFail);
 			}
 		}
