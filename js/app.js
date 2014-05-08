@@ -291,6 +291,7 @@ $(document).ready(function() {
 	});
 	
 	$('#new_zap_button').click(function() {
+		debug("New zap button clicked");
 		$('#results').slideUp(function() {
 			zip.resetSearchData();
 		});
@@ -335,8 +336,10 @@ $(document).ready(function() {
 				// This is a workaround to avoid the occurence of a bug: 
 				// The google earth element cannot be hidden during creation, or
 				// it will never display properly.
-				$('#tabs').tabs('option', 'disabled', [0,1]);
-				$('#new_zap_button').attr('disabled', true);
+				if (google.earth.isInstalled()) {
+					$('#tabs').tabs('option', 'disabled', [0,1]);
+					$('#new_zap_button').attr('disabled', true);
+				}
 				google.earth.createInstance('google_earth', zip.geComplete, zip.geFail);
 			}
 		}

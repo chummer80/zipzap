@@ -146,6 +146,6 @@ input[type="submit"]:not(:disabled):active {
 	margin-top: 2rem;
 }
 
-#new_zap_button:active {
+#new_zap_button:not(:disabled):active {
 	font-size: 1.8rem;
 }
