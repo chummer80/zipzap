@@ -22,9 +22,12 @@ $(document).ready(function() {
 		zipCode: '',
 		zipCoordinates: {},
 		map: null,	//google.maps.Map object
+		mapExists: false,
 		geocodingBounds: null,	//google.maps.LatLngBounds object
 		zipCodeOverlay: null,	//google.maps.GroundOverlay object
-		ge: null // google earth object
+		ge: null, // google earth object
+		geExists: false
+		
 	};
 	
 	/***************
@@ -299,16 +302,18 @@ $(document).ready(function() {
 	* Start
 	****************/
 	
-	// initialize JQuery tab widget
+	// initialize JQueryUI tab widget
 	$('#tabs').tabs({
 		activate: function (event, ui) {
 			// the first time this tab is viewed, create google map
-			if (ui.newPanel.is('#google_map_canvas') && !(zip.map instanceof google.maps.Map)) {
+			if (ui.newPanel.is('#google_map_canvas') && !zip.mapExists) {
+				zip.mapExists = true;	
 				zip.drawMap();
 				zip.startGeocode();
 			}
 			// the first time this tab is viewed, create google earth obj
-			else if (ui.newPanel.is('#google_earth') && !zip.ge) {
+			else if (ui.newPanel.is('#google_earth') && !zip.geExists) {
+				zip.geExists = true;	// this flag is just to make sure only 1 ge object gets created
 				google.earth.createInstance('google_earth', zip.geComplete, zip.geFail);
 			}
 		}
